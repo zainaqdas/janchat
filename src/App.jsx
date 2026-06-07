@@ -8,6 +8,7 @@ import Register from './pages/Register'
 import Contacts from './pages/Contacts'
 import ChatPage from './pages/Chat'
 import Settings from './pages/Settings'
+import CallHistory from './pages/CallHistory'
 import Sidebar from './components/layout/Sidebar'
 import ChatWindow from './components/chat/ChatWindow'
 import MobileNav from './components/layout/MobileNav'
@@ -54,6 +55,7 @@ function AppLayout() {
               <Routes>
                 <Route path="/contacts" element={<Contacts />} />
                 <Route path="/chat/:contactId" element={<><ChatPage /><ChatWindow /></>} />
+                <Route path="/call-history" element={<CallHistory />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/" element={<Navigate to="/contacts" replace />} />
               </Routes>

@@ -14,6 +14,7 @@ import {
   subscribeToIncomingCalls,
 } from '../services/callSignaling'
 import { supabase } from '../lib/supabase'
+import { recordCall, updateCallStatus } from '../services/callHistory'
 
 const CallContext = createContext(null)
 
@@ -39,6 +40,13 @@ export function CallProvider({ children }) {
   const currentCallIdRef = useRef(null)
   const screenStreamRef = useRef(null)
   const pendingCandidatesRef = useRef([])
+  const callStartTimeRef = useRef(null)
+  const callStateRef = useRef('idle')
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    callStateRef.current = callState
+  }, [callState])
 
   // Cleanup function
   const cleanupCall = useCallback(() => {
@@ -164,11 +172,16 @@ export function CallProvider({ children }) {
         setCallType(type)
         setCallState('connecting')
 
+        // Record the call in history
+        await recordCall(callId, user.id, contact.id, type)
+        callStartTimeRef.current = Date.now()
+
         const pc = createPeerConnection(stream)
 
         // Subscribe to the call channel
         const channel = await subscribeToCall(callId, user.id, {
           onAnswer: async (answerDesc) => {
+            callStartTimeRef.current = Date.now()
             await pc.setRemoteDescription(new RTCSessionDescription(answerDesc))
             // Send any pending ICE candidates
             for (const candidate of pendingCandidatesRef.current) {
@@ -225,6 +238,10 @@ export function CallProvider({ children }) {
       setCallType(isVideoCall ? 'video' : 'audio')
       setCallState('connecting')
 
+      // Mark the call as answered
+      await updateCallStatus(currentCallIdRef.current, 'answered', 0)
+      callStartTimeRef.current = Date.now()
+
       // Now create local stream with correct video setting
       const stream = await getLocalStream(isVideoCall)
 
@@ -280,6 +297,7 @@ export function CallProvider({ children }) {
   // Reject an incoming call
   const rejectCall = useCallback(async () => {
     if (currentCallIdRef.current && callPartner) {
+      await updateCallStatus(currentCallIdRef.current, 'rejected', 0)
       await supabase
         .from('call_signals')
         .delete()
@@ -291,6 +309,13 @@ export function CallProvider({ children }) {
   // End the current call
   const endCall = useCallback(async () => {
     if (currentCallIdRef.current && callChannelRef.current) {
+      // Calculate duration and update history before cleanup
+      const wasConnected = callStateRef.current === 'connected'
+      const duration = callStartTimeRef.current && wasConnected
+        ? (Date.now() - callStartTimeRef.current) / 1000
+        : 0
+      await updateCallStatus(currentCallIdRef.current, 'answered', duration)
+
       await callChannelRef.current.send({
         type: 'broadcast',
         event: 'end-call',
