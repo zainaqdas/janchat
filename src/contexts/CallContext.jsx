@@ -75,10 +75,16 @@ export function CallProvider({ children }) {
   useEffect(() => {
     if (!user) return
 
-    const sub = subscribeToIncomingCalls(user.id, (callSignal) => {
+    const sub = subscribeToIncomingCalls(user.id, async (callSignal) => {
       if (callState === 'idle') {
+        // Fetch the caller's profile (payload.new is a raw row, not a joined object)
+        const { data: callerProfile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', callSignal.caller_id)
+          .single()
         setIncomingCall(callSignal)
-        setCallPartner(callSignal.caller)
+        setCallPartner(callerProfile)
         setCallState('ringing')
         currentCallIdRef.current = callSignal.call_id
       }
