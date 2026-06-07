@@ -99,9 +99,34 @@ export function ChatProvider({ children }) {
       }
     })
 
+    // Subscribe to message updates (read receipts)
+    // When the recipient reads our messages, update them in real-time
+    const readReceiptSub = supabase
+      .channel(`read-receipts-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+          filter: `sender_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const updated = payload.new
+          // Only react to read status changes
+          if (updated.read) {
+            setMessages((prev) =>
+              prev.map((msg) => (msg.id === updated.id ? { ...msg, read: true } : msg))
+            )
+          }
+        }
+      )
+      .subscribe()
+
     return () => {
       incomingSub.unsubscribe()
       sentSub.unsubscribe()
+      supabase.removeChannel(readReceiptSub)
     }
   }, [user])
 
