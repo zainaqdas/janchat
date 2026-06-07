@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react'
 import { useCall } from '../../contexts/CallContext'
 
 export default function AudioCall() {
@@ -5,15 +6,27 @@ export default function AudioCall() {
     callState,
     callType,
     callPartner,
+    remoteStream,
     isMuted,
     endCall,
     toggleMute,
   } = useCall()
 
+  const audioRef = useRef(null)
+
+  useEffect(() => {
+    if (audioRef.current && remoteStream) {
+      audioRef.current.srcObject = remoteStream
+    }
+  }, [remoteStream])
+
   if (callState === 'idle' || callType !== 'audio') return null
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/90">
+      {/* Hidden audio element to play the remote stream */}
+      <audio ref={audioRef} autoPlay />
+
       <div className="text-center">
         <div className="mx-auto mb-6 flex h-28 w-28 items-center justify-center rounded-full bg-blue-600 text-5xl font-bold text-white shadow-lg">
           {callPartner?.username?.[0]?.toUpperCase() || '?'}
