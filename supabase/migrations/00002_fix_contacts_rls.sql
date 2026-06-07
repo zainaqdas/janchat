@@ -6,6 +6,7 @@
 -- =============================================================================
 
 drop policy if exists "Users can read own contacts" on public.contacts;
+drop policy if exists "Users can insert contacts" on public.contacts;
 drop policy if exists "Users can update own contacts" on public.contacts;
 drop policy if exists "Users can delete own contacts" on public.contacts;
 
