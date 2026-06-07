@@ -37,13 +37,13 @@ export default function VideoCall() {
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-black">
       {/* Remote video (large) */}
-      <div className="relative flex-1 bg-gray-900">
+      <div className="relative flex flex-1 items-center justify-center bg-gray-900">
         {remoteStream ? (
           <video
             ref={remoteVideoRef}
             autoPlay
             playsInline
-            className="h-full w-full object-cover"
+            className="max-h-full max-w-full object-contain"
           />
         ) : (
           <div className="flex h-full items-center justify-center">
