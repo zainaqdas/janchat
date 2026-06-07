@@ -192,12 +192,7 @@ export function CallProvider({ children }) {
         await pc.setLocalDescription(offer)
 
         await sendSignal(callId, user.id, contact.id, 'offer', offer)
-        // Also broadcast the offer via Realtime
-        await channel.send({
-          type: 'broadcast',
-          event: 'offer',
-          payload: { signalData: offer, callerId: user.id, receiverId: contact.id },
-        })
+        // Note: sendSignal already broadcasts via Realtime, no need for a second channel.send
       } catch (err) {
         console.error('Failed to start call:', err)
         cleanupCall()
@@ -255,11 +250,7 @@ export function CallProvider({ children }) {
           'answer',
           answer
         )
-        await channel.send({
-          type: 'broadcast',
-          event: 'answer',
-          payload: { signalData: answer, callerId: callPartner.id, receiverId: user.id },
-        })
+        // Note: sendSignal already broadcasts via Realtime, no need for a second channel.send
 
         // Send any pending ICE candidates
         for (const candidate of pendingCandidatesRef.current) {
