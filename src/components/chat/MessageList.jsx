@@ -54,11 +54,11 @@ export default function MessageList({ messages, typing, contact }) {
           <div key={msg.id}>
             <div className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
               <div
-                className={`max-w-[75%] rounded-2xl px-4 py-2 ${
-                  isMine
-                    ? 'bg-blue-600 text-white rounded-br-sm'
-                    : 'bg-gray-800 text-gray-100 rounded-bl-sm'
-                }`}
+              className={`max-w-[75%] rounded-2xl px-4 py-2 ${
+                isMine
+                  ? 'bg-gray-700 text-white rounded-br-sm'
+                  : 'bg-gray-900 text-gray-100 rounded-bl-sm'
+              }`}
               >
                 <p className="text-sm whitespace-pre-wrap break-words">{msg.message}</p>
                 <div className={`mt-0.5 flex items-center gap-1 ${isMine ? 'justify-end' : 'justify-start'}`}>
