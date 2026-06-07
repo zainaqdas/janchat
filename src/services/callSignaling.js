@@ -6,8 +6,6 @@ import { supabase } from '../lib/supabase'
  * to exchange SDP offers/answers and ICE candidates.
  */
 
-let channel = null
-
 export function getCallChannel(callId) {
   return supabase.channel(`call:${callId}`, {
     config: {
@@ -16,8 +14,8 @@ export function getCallChannel(callId) {
   })
 }
 
-export async function sendSignal(callId, callerId, receiverId, signalType, signalData) {
-  // Persist signal in the database as fallback
+// Persist a signal in the database (broadcast is handled by the caller via their channel ref)
+export async function persistSignal(callId, callerId, receiverId, signalType, signalData) {
   const { error } = await supabase.from('call_signals').insert({
     caller_id: callerId,
     receiver_id: receiverId,
@@ -26,20 +24,10 @@ export async function sendSignal(callId, callerId, receiverId, signalType, signa
     call_id: callId,
   })
   if (error) console.error('Failed to persist signal:', error)
-
-  // Also broadcast via Realtime presence/broadcast
-  if (channel) {
-    await channel.send({
-      type: 'broadcast',
-      event: signalType,
-      payload: { signalData, callerId, receiverId },
-    })
-  }
 }
 
 export async function subscribeToCall(callId, userId, handlers) {
   const callChannel = getCallChannel(callId)
-  channel = callChannel
 
   callChannel.on('broadcast', { event: 'offer' }, ({ payload }) => {
     if (payload.receiverId === userId && handlers.onOffer) {
@@ -73,32 +61,6 @@ export function unsubscribeFromCall(callChannel) {
   if (callChannel) {
     supabase.removeChannel(callChannel)
   }
-  channel = null
-}
-
-export async function initiateCall(callerId, receiverId) {
-  const callId = crypto.randomUUID()
-  const { error } = await supabase.from('call_signals').insert({
-    caller_id: callerId,
-    receiver_id: receiverId,
-    signal_type: 'offer',
-    signal_data: { type: 'call-initiated' },
-    call_id: callId,
-  })
-  if (error) throw error
-  return callId
-}
-
-export async function getPendingCalls(userId) {
-  const { data, error } = await supabase
-    .from('call_signals')
-    .select('*, caller:caller_id(*)')
-    .eq('receiver_id', userId)
-    .eq('signal_type', 'offer')
-    .order('created_at', { ascending: false })
-    .limit(10)
-  if (error) throw error
-  return data
 }
 
 export function subscribeToIncomingCalls(userId, onCall) {

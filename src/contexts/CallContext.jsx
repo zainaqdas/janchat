@@ -10,7 +10,7 @@ import { useAuth } from './AuthContext'
 import {
   subscribeToCall,
   unsubscribeFromCall,
-  sendSignal,
+  persistSignal,
   subscribeToIncomingCalls,
 } from '../services/callSignaling'
 import { supabase } from '../lib/supabase'
@@ -122,13 +122,16 @@ export function CallProvider({ children }) {
 
     pc.onicecandidate = (e) => {
       if (e.candidate && currentCallIdRef.current && callPartner) {
-        sendSignal(
-          currentCallIdRef.current,
-          user.id,
-          callPartner.id,
-          'ice-candidate',
-          e.candidate
-        ).catch(console.error)
+        const callId = currentCallIdRef.current
+        const channel = callChannelRef.current
+        persistSignal(callId, user.id, callPartner.id, 'ice-candidate', e.candidate)
+        if (channel) {
+          channel.send({
+            type: 'broadcast',
+            event: 'ice-candidate',
+            payload: { signalData: e.candidate, callerId: user.id, receiverId: callPartner.id },
+          }).catch(console.error)
+        }
       }
     }
 
@@ -191,8 +194,12 @@ export function CallProvider({ children }) {
         const offer = await pc.createOffer()
         await pc.setLocalDescription(offer)
 
-        await sendSignal(callId, user.id, contact.id, 'offer', offer)
-        // Note: sendSignal already broadcasts via Realtime, no need for a second channel.send
+        await persistSignal(callId, user.id, contact.id, 'offer', offer)
+        await channel.send({
+          type: 'broadcast',
+          event: 'offer',
+          payload: { signalData: offer, callerId: user.id, receiverId: contact.id },
+        })
       } catch (err) {
         console.error('Failed to start call:', err)
         cleanupCall()
@@ -243,14 +250,18 @@ export function CallProvider({ children }) {
         const answer = await pc.createAnswer()
         await pc.setLocalDescription(answer)
 
-        await sendSignal(
+        await persistSignal(
           currentCallIdRef.current,
           user.id,
           callPartner.id,
           'answer',
           answer
         )
-        // Note: sendSignal already broadcasts via Realtime, no need for a second channel.send
+        await channel.send({
+          type: 'broadcast',
+          event: 'answer',
+          payload: { signalData: answer, callerId: callPartner.id, receiverId: user.id },
+        })
 
         // Send any pending ICE candidates
         for (const candidate of pendingCandidatesRef.current) {
