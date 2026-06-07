@@ -1,5 +1,5 @@
 import ErrorBoundary from './components/ErrorBoundary'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { ChatProvider } from './contexts/ChatContext'
 import { CallProvider } from './contexts/CallContext'
@@ -10,6 +10,7 @@ import ChatPage from './pages/Chat'
 import Settings from './pages/Settings'
 import Sidebar from './components/layout/Sidebar'
 import ChatWindow from './components/chat/ChatWindow'
+import MobileNav from './components/layout/MobileNav'
 import IncomingCall from './components/call/IncomingCall'
 import AudioCall from './components/call/AudioCall'
 import VideoCall from './components/call/VideoCall'
@@ -35,24 +36,35 @@ function ProtectedRoute({ children }) {
 
 function AppLayout() {
   useNotifications()
+  const location = useLocation()
+  const isChatRoute = location.pathname.startsWith('/chat/')
 
   return (
     <CallProvider>
       <ChatProvider>
         <div className="flex h-dvh">
-          {/* Sidebar - hidden on mobile when chat is active */}
+          {/* Desktop sidebar */}
           <div className="hidden w-80 flex-shrink-0 md:block">
             <Sidebar />
           </div>
 
-          {/* Main content area - ChatWindow or Contacts */}
-          <div className="flex flex-1">
-            <Routes>
-              <Route path="/contacts" element={<Contacts />} />
-              <Route path="/chat/:contactId" element={<><ChatPage /><ChatWindow /></>} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/" element={<Navigate to="/contacts" replace />} />
-            </Routes>
+          {/* Main content + mobile bottom nav */}
+          <div className="flex flex-1 flex-col min-w-0">
+            <div className="flex-1 overflow-hidden">
+              <Routes>
+                <Route path="/contacts" element={<Contacts />} />
+                <Route path="/chat/:contactId" element={<><ChatPage /><ChatWindow /></>} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/" element={<Navigate to="/contacts" replace />} />
+              </Routes>
+            </div>
+
+            {/* Mobile bottom nav - hidden during chat and on desktop */}
+            {!isChatRoute && (
+              <div className="md:hidden">
+                <MobileNav />
+              </div>
+            )}
           </div>
         </div>
 
