@@ -111,7 +111,7 @@ export function ChatProvider({ children }) {
   useEffect(() => {
     if (!user) return
 
-    const channel = supabase.channel('typing-indicators')
+    const channel = supabase.channel(`typing-indicators-${user.id}`)
     typingChannelRef.current = channel
 
     channel

@@ -14,6 +14,8 @@ export default function Contacts() {
   const [requests, setRequests] = useState([])
   const [searching, setSearching] = useState(false)
   const [addingContact, setAddingContact] = useState(null)
+  const [acceptingId, setAcceptingId] = useState(null)
+  const [removingId, setRemovingId] = useState(null)
 
   useEffect(() => {
     loadContacts()
@@ -62,21 +64,27 @@ export default function Contacts() {
   }
 
   const handleAccept = async (id) => {
+    setAcceptingId(id)
     try {
       await acceptContactRequest(id)
       loadRequests()
       loadContacts()
     } catch (err) {
       console.error(err)
+    } finally {
+      setAcceptingId(null)
     }
   }
 
   const handleRemove = async (id) => {
+    setRemovingId(id)
     try {
       await removeContact(id)
       loadContacts()
     } catch (err) {
       console.error(err)
+    } finally {
+      setRemovingId(null)
     }
   }
 
@@ -148,9 +156,10 @@ export default function Contacts() {
               </div>
               <button
                 onClick={() => handleAccept(r.id)}
-                className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700"
+                disabled={acceptingId === r.id}
+                className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700 disabled:opacity-50"
               >
-                Accept
+                {acceptingId === r.id ? '…' : 'Accept'}
               </button>
             </div>
           ))}
@@ -190,7 +199,8 @@ export default function Contacts() {
               </button>
               <button
                 onClick={() => handleRemove(c.id)}
-                className="rounded p-1.5 text-gray-500 transition hover:bg-gray-800 hover:text-red-400"
+                disabled={removingId === c.id}
+                className="rounded p-1.5 text-gray-500 transition hover:bg-gray-800 hover:text-red-400 disabled:opacity-30"
                 title="Remove contact"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

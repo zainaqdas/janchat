@@ -103,7 +103,7 @@ export async function getPendingCalls(userId) {
 
 export function subscribeToIncomingCalls(userId, onCall) {
   return supabase
-    .channel('incoming-calls')
+    .channel(`incoming-calls-${userId}`)
     .on(
       'postgres_changes',
       {

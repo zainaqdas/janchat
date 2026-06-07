@@ -44,7 +44,7 @@ export async function getUnreadCount(userId) {
 export async function getUnreadCountBySender(userId) {
   const { data, error } = await supabase
     .from('messages')
-    .select('sender_id, count')
+    .select('sender_id')
     .eq('receiver_id', userId)
     .eq('read', false)
   if (error) throw error
@@ -57,7 +57,7 @@ export async function getUnreadCountBySender(userId) {
 
 export function subscribeToMessages(userId, callback) {
   return supabase
-    .channel('messages-channel')
+    .channel(`messages-channel-${userId}`)
     .on(
       'postgres_changes',
       {
@@ -73,7 +73,7 @@ export function subscribeToMessages(userId, callback) {
 
 export function subscribeToSentMessages(userId, callback) {
   return supabase
-    .channel('sent-messages-channel')
+    .channel(`sent-messages-channel-${userId}`)
     .on(
       'postgres_changes',
       {

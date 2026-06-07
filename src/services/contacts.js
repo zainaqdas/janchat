@@ -54,8 +54,22 @@ export async function acceptContactRequest(contactId) {
 }
 
 export async function removeContact(contactId) {
-  const { error } = await supabase.from('contacts').delete().eq('id', contactId)
-  if (error) throw error
+  // Fetch the entry first to get both user IDs
+  const { data: entry, error: fetchError } = await supabase
+    .from('contacts')
+    .select('*')
+    .eq('id', contactId)
+    .single()
+  if (fetchError) throw fetchError
+
+  // Delete both directions (the entry and the reciprocal one)
+  const { error: delError } = await supabase
+    .from('contacts')
+    .delete()
+    .or(
+      `and(user_id.eq.${entry.user_id},contact_id.eq.${entry.contact_id}),and(user_id.eq.${entry.contact_id},contact_id.eq.${entry.user_id})`
+    )
+  if (delError) throw delError
 }
 
 export async function getAcceptedContacts(userId) {
