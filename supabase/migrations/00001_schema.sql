@@ -73,16 +73,19 @@ alter table public.call_signals enable row level security;
 
 -- PROFILES
 -- Everyone can read all profiles (needed for user search)
+drop policy if exists "Anyone can read profiles" on public.profiles;
 create policy "Anyone can read profiles"
   on public.profiles for select
   using (true);
 
 -- Users can insert their own profile
+drop policy if exists "Users can insert own profile" on public.profiles;
 create policy "Users can insert own profile"
   on public.profiles for insert
   with check (id = auth.uid());
 
 -- Users can update their own profile
+drop policy if exists "Users can update own profile" on public.profiles;
 create policy "Users can update own profile"
   on public.profiles for update
   using (id = auth.uid())
@@ -90,54 +93,64 @@ create policy "Users can update own profile"
 
 -- CONTACTS
 -- Users can read contacts they are part of (as sender or recipient)
+drop policy if exists "Users can read own contacts" on public.contacts;
 create policy "Users can read own contacts"
   on public.contacts for select
   using (auth.uid() = user_id or auth.uid() = contact_id);
 
 -- Users can insert contact requests
+drop policy if exists "Users can insert contacts" on public.contacts;
 create policy "Users can insert contacts"
   on public.contacts for insert
   with check (auth.uid() = user_id);
 
 -- Users can update contacts they are part of (accept, block, remove)
+drop policy if exists "Users can update own contacts" on public.contacts;
 create policy "Users can update own contacts"
   on public.contacts for update
   using (auth.uid() = user_id or auth.uid() = contact_id)
   with check (auth.uid() = user_id or auth.uid() = contact_id);
 
 -- Users can delete contacts they are part of
+drop policy if exists "Users can delete own contacts" on public.contacts;
 create policy "Users can delete own contacts"
   on public.contacts for delete
   using (auth.uid() = user_id or auth.uid() = contact_id);
 
 -- MESSAGES
 -- Users can read messages they sent or received
+drop policy if exists "Users can read their messages" on public.messages;
 create policy "Users can read their messages"
   on public.messages for select
   using (auth.uid() = sender_id or auth.uid() = receiver_id);
 
 -- Users can send messages
+drop policy if exists "Users can insert messages" on public.messages;
 create policy "Users can insert messages"
   on public.messages for insert
   with check (auth.uid() = sender_id);
 
 -- Users can mark messages as read (only their received messages)
+drop policy if exists "Users can update messages they received" on public.messages;
 create policy "Users can update messages they received"
   on public.messages for update
   using (auth.uid() = receiver_id);
 
 -- CALL_SIGNALS
 -- Users can read call signals they are involved in
+drop policy if exists "Users can read call signals" on public.call_signals;
 create policy "Users can read call signals"
   on public.call_signals for select
   using (auth.uid() = caller_id or auth.uid() = receiver_id);
 
 -- Users can insert call signals
+drop policy if exists "Users can insert call signals" on public.call_signals;
 create policy "Users can insert call signals"
   on public.call_signals for insert
   with check (auth.uid() = caller_id);
 
 -- Users can delete their own call signals
+drop policy if exists "Users can delete call signals" on public.call_signals;
 create policy "Users can delete call signals"
   on public.call_signals for delete
   using (auth.uid() = caller_id or auth.uid() = receiver_id);
