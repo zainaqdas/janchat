@@ -55,10 +55,12 @@ export default function MessageList({ messages, typing }) {
                     {/* Read receipt: single check (sent) or double check (read) */}
                     {msg.read ? (
                       <span className="flex items-center gap-0.5 text-[10px] text-blue-400">
-                        <svg className="h-3 w-3" viewBox="0 0 16 11" fill="currentColor">
-                          <path d="M11.071.653a.457.457 0 00-.304-.102.493.493 0 00-.381.178l-6.19 7.636-2.011-2.095a.463.463 0 00-.336-.153.457.457 0 00-.335.134l-.455.455a.473.473 0 000 .665l2.757 2.755.473.473c.1.1.218.15.355.15a.544.544 0 00.374-.168l6.945-8.527a.465.465 0 00.095-.363.474.474 0 00-.177-.28z" />
+                        <svg className="h-3.5 w-3.5" viewBox="0 0 22 12" fill="currentColor">
+                          {/* Back check */}
+                          <path d="M15.774 1.672a.422.422 0 10-.396-.745L9.582 4.23l1.34 1.405 4.852-3.963z" />
+                          {/* Front check */}
+                          <path d="M21.774 1.672a.422.422 0 10-.396-.745L11.582 8.23 9.34 5.855a.422.422 0 10-.63.562l2.63 2.825a.422.422 0 00.597.046l9.837-9.614z" opacity="0.9" />
                         </svg>
-                        Seen
                       </span>
                     ) : (
                       <svg className="h-3 w-3 text-gray-400" viewBox="0 0 16 11" fill="currentColor">
