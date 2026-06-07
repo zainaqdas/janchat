@@ -50,7 +50,7 @@ function AppLayout() {
 
           {/* Main content + mobile bottom nav */}
           <div className="flex flex-1 flex-col min-w-0">
-            <div className="flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden min-h-0">
               <Routes>
                 <Route path="/contacts" element={<Contacts />} />
                 <Route path="/chat/:contactId" element={<><ChatPage /><ChatWindow /></>} />
@@ -61,7 +61,7 @@ function AppLayout() {
 
             {/* Mobile bottom nav - hidden during chat and on desktop */}
             {!isChatRoute && (
-              <div className="md:hidden">
+              <div className="md:hidden flex-shrink-0">
                 <MobileNav />
               </div>
             )}
