@@ -16,6 +16,7 @@ import IncomingCall from './components/call/IncomingCall'
 import AudioCall from './components/call/AudioCall'
 import VideoCall from './components/call/VideoCall'
 import { useNotifications } from './hooks/useNotifications'
+import { usePushNotifications } from './hooks/usePushNotifications'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -37,6 +38,7 @@ function ProtectedRoute({ children }) {
 
 function AppLayout() {
   useNotifications()
+  usePushNotifications()
   const location = useLocation()
   const isChatRoute = location.pathname.startsWith('/chat/')
 
