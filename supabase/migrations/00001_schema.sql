@@ -89,25 +89,26 @@ create policy "Users can update own profile"
   with check (id = auth.uid());
 
 -- CONTACTS
--- Users can read their own contacts
+-- Users can read contacts they are part of (as sender or recipient)
 create policy "Users can read own contacts"
   on public.contacts for select
-  using (auth.uid() = user_id);
+  using (auth.uid() = user_id or auth.uid() = contact_id);
 
 -- Users can insert contact requests
 create policy "Users can insert contacts"
   on public.contacts for insert
   with check (auth.uid() = user_id);
 
--- Users can update their own contacts (accept, block, remove)
+-- Users can update contacts they are part of (accept, block, remove)
 create policy "Users can update own contacts"
   on public.contacts for update
-  using (auth.uid() = user_id);
+  using (auth.uid() = user_id or auth.uid() = contact_id)
+  with check (auth.uid() = user_id or auth.uid() = contact_id);
 
--- Users can delete their own contacts
+-- Users can delete contacts they are part of
 create policy "Users can delete own contacts"
   on public.contacts for delete
-  using (auth.uid() = user_id);
+  using (auth.uid() = user_id or auth.uid() = contact_id);
 
 -- MESSAGES
 -- Users can read messages they sent or received
