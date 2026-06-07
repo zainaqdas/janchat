@@ -180,17 +180,17 @@ export default function Contacts() {
           acceptedContacts.map((c) => (
             <div
               key={c.id}
-              className="flex items-center justify-between px-4 py-3 hover:bg-gray-900"
+              className="flex items-center justify-between px-3 py-2.5 hover:bg-gray-900 md:px-4 md:py-3"
             >
               <button
                 onClick={() => handleChat(c.contact)}
-                className="flex flex-1 items-center gap-3"
+                className="flex min-w-0 flex-1 items-center gap-2 md:gap-3"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-medium text-white">
+                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-medium text-white md:h-10 md:w-10 md:text-sm">
                   {c.contact?.username?.[0]?.toUpperCase() || '?'}
                 </div>
-                <div className="text-left">
-                  <span className="text-sm font-medium text-white">{c.contact?.username}</span>
+                <div className="min-w-0 text-left">
+                  <span className="truncate text-sm font-medium text-white">{c.contact?.username}</span>
                   <div className="flex items-center gap-1">
                     <div className="h-2 w-2 rounded-full bg-green-500" />
                     <span className="text-xs text-gray-500">Online</span>
@@ -200,7 +200,7 @@ export default function Contacts() {
               <button
                 onClick={() => handleRemove(c.id)}
                 disabled={removingId === c.id}
-                className="rounded p-1.5 text-gray-500 transition hover:bg-gray-800 hover:text-red-400 disabled:opacity-30"
+                className="flex-shrink-0 rounded p-1.5 text-gray-500 transition hover:bg-gray-800 hover:text-red-400 disabled:opacity-30"
                 title="Remove contact"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
