@@ -50,7 +50,7 @@ function AppLayout() {
 
           {/* Main content + mobile bottom nav */}
           <div className="flex flex-1 flex-col min-w-0">
-            <div className="flex flex-1 overflow-hidden min-h-0">
+            <div className="flex-1 overflow-hidden min-h-0">
               <Routes>
                 <Route path="/contacts" element={<Contacts />} />
                 <Route path="/chat/:contactId" element={<><ChatPage /><ChatWindow /></>} />
