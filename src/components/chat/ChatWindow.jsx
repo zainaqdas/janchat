@@ -13,6 +13,22 @@ export default function ChatWindow() {
   const navigate = useNavigate()
   const [callMenuOpen, setCallMenuOpen] = useState(false)
 
+  const contactId = activeChat?.contact?.id
+  const contact = activeChat?.contact
+
+  const handleSend = useCallback(
+    (text) => {
+      if (!contactId) return
+      sendMessage(contactId, text)
+    },
+    [contactId, sendMessage]
+  )
+
+  const handleTyping = useCallback(() => {
+    if (!contactId) return
+    sendTypingIndicator(contactId)
+  }, [contactId, sendTypingIndicator])
+
   if (!activeChat?.contact) {
     return (
       <div className="flex h-full items-center justify-center bg-gray-950">
@@ -31,19 +47,7 @@ export default function ChatWindow() {
     )
   }
 
-  const contact = activeChat.contact
   const isTyping = typingUsers[contact.id]
-
-  const handleSend = useCallback(
-    (text) => {
-      sendMessage(contact.id, text)
-    },
-    [contact.id, sendMessage]
-  )
-
-  const handleTyping = useCallback(() => {
-    sendTypingIndicator(contact.id)
-  }, [contact.id, sendTypingIndicator])
 
   const handleAudioCall = () => {
     setCallMenuOpen(false)
