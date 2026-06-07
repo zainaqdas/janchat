@@ -76,17 +76,21 @@ export function CallProvider({ children }) {
     if (!user) return
 
     const sub = subscribeToIncomingCalls(user.id, async (callSignal) => {
-      if (callState === 'idle') {
-        // Fetch the caller's profile (payload.new is a raw row, not a joined object)
+      if (callState !== 'idle') return
+      try {
+        // Fetch the caller's profile (callSignal is a raw DB row, not a joined object)
         const { data: callerProfile } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', callSignal.caller_id)
-          .single()
+          .maybeSingle()
+        if (!callerProfile) return
         setIncomingCall(callSignal)
         setCallPartner(callerProfile)
         setCallState('ringing')
         currentCallIdRef.current = callSignal.call_id
+      } catch (err) {
+        console.error('Failed to fetch caller profile:', err)
       }
     })
 
