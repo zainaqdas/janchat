@@ -30,7 +30,7 @@ export default function MessageInput({ onSend, onTyping, disabled }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-gray-800 bg-gray-900 px-4 py-3">
+    <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-gray-800 bg-gray-900 px-4 py-3" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 0px))' }}>
       <input
         type="text"
         value={text}

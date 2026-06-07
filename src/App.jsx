@@ -39,7 +39,7 @@ function AppLayout() {
   return (
     <CallProvider>
       <ChatProvider>
-        <div className="flex h-screen">
+        <div className="flex h-dvh">
           {/* Sidebar - hidden on mobile when chat is active */}
           <div className="hidden w-80 flex-shrink-0 md:block">
             <Sidebar />
