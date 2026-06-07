@@ -111,7 +111,7 @@ export default function ChatWindow() {
       </div>
 
       {/* Messages */}
-      <MessageList messages={messages} typing={isTyping} />
+      <MessageList messages={messages} typing={isTyping} contact={contact} />
 
       {/* Input */}
       <MessageInput
